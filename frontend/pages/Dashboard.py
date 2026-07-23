@@ -20,6 +20,116 @@ st.markdown("""
 .main {
     background: linear-gradient(180deg, #F5F7FB, #EEF2FF);
 }
+            /* ============ SIDEBAR REDESIGN ============ */
+
+[data-testid="stSidebar"]{
+    background: linear-gradient(180deg, #0F172A 0%, #172554 100%);
+    border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+[data-testid="stSidebar"] *{
+    color:white;
+}
+
+section[data-testid="stSidebar"] {
+    width: 300px !important;
+}
+section[data-testid="stSidebar"] > div {
+    width: 300px !important;
+    padding: 0 !important;
+}
+
+/* Hide default Streamlit page navigation */
+[data-testid="stSidebarNav"] {
+    display: none;
+}
+
+/* Brand / logo header */
+.sidebar-brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:28px 22px 22px 22px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    margin-bottom:18px;
+}
+.sidebar-brand-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#2563EB,#38BDF8);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    box-shadow:0 4px 12px rgba(37,99,235,0.4);
+    flex-shrink:0;
+}
+.sidebar-brand-text{
+    line-height:1.25;
+}
+.sidebar-brand-title{
+    font-size:15.5px;
+    font-weight:800;
+    color:white;
+}
+.sidebar-brand-sub{
+    font-size:12px;
+    color:#94A3B8;
+    font-weight:500;
+}
+
+/* Nav section label */
+.sidebar-section-label{
+    font-size:11.5px;
+    font-weight:700;
+    color:#64748B;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    padding:0 22px;
+    margin:6px 0 10px 0;
+}
+
+/* Nav link container padding */
+[data-testid="stSidebar"] .element-container:has(.stPageLink) {
+    padding: 0 14px;
+}
+
+/* Sidebar page links */
+[data-testid="stSidebar"] .stPageLink a {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px 16px;
+    margin:4px 0;
+    border-radius:12px;
+    font-size:15px;
+    font-weight:600;
+    color:#CBD5E1 !important;
+    background:transparent;
+    transition:all 0.25s ease;
+    border:1px solid transparent;
+}
+
+[data-testid="stSidebar"] .stPageLink a:hover {
+    background:rgba(37,99,235,0.18);
+    border:1px solid rgba(56,189,248,0.25);
+    color:white !important;
+    transform:translateX(6px);
+}
+
+/* Sidebar footer */
+.sidebar-footer{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    padding:18px 22px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    font-size:12px;
+    color:#64748B;
+    text-align:center;
+}
 
 /* Title */
 h1 {
@@ -93,10 +203,66 @@ div.stPlotlyChart {
 </style>
 """, unsafe_allow_html=True)
 
+
+with st.sidebar:
+
+    st.markdown("""
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">🚀</div>
+        <div class="sidebar-brand-text">
+            <div class="sidebar-brand-title">Churn Platform</div>
+            <div class="sidebar-brand-sub">AI Retention Analytics</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<div class='sidebar-section-label'>Navigation</div>", unsafe_allow_html=True)
+
+    st.page_link(
+        "Home.py",
+        label="  Home"
+    )
+
+    st.page_link(
+        "pages/Prediction.py",
+        label="  Prediction"
+    )
+
+#######################################
+# TITLE
+#######################################
+st.markdown("""
+# 📊 Customer Churn Analytics Dashboard
+<div class="subtitle">
+AI-powered insights for customer retention and churn prediction
+</div>
+""", unsafe_allow_html=True)
+
 #######################################
 # LOAD DATA
 #######################################
-df = pd.read_csv('data/WA_Fn-UseC_-Telco-Customer-Churn.csv')
+
+
+if "uploaded_df" in st.session_state:
+
+    df = st.session_state["uploaded_df"]
+
+else:
+
+    st.warning(
+        "⚠️ Please upload a customer CSV file from the Prediction page first."
+    )
+
+    st.stop()
+col1, col2, col3 = st.columns([1, 4, 1])
+
+with col1:
+    st.markdown("<div style='margin-top:30px'></div>", unsafe_allow_html=True)
+
+    st.page_link(
+        "pages/Prediction.py",
+        label="⬅ Back"
+    )  
 
 df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
 df.dropna(inplace=True)
@@ -114,15 +280,7 @@ retention = round(retained / customers * 100, 2)
 avg_bill = round(df['MonthlyCharges'].mean(), 2)
 avg_tenure = round(df['tenure'].mean(), 1)
 
-#######################################
-# TITLE
-#######################################
-st.markdown("""
-# 📊 Customer Churn Analytics Dashboard
-<div class="subtitle">
-AI-powered insights for customer retention and churn prediction
-</div>
-""", unsafe_allow_html=True)
+
 
 #######################################
 # KPI CARDS
@@ -147,34 +305,74 @@ for col, data in zip([c1, c2, c3, c4], cards):
         """, unsafe_allow_html=True)
 
 #######################################
+# CHART COLOR PALETTE
+# Tableau10 classic categorical palette —
+# industry-standard, distinct, professional,
+# not neon, not all one hue.
+#######################################
+TABLEAU10 = [
+    "#4E79A7",  # blue
+    "#F28E2B",  # orange
+    "#CE8283",  # green
+    "#CE8283",  # red
+    "#DA86C2",  # purple
+    "#9C755F",  # brown
+    "#EDC948",  # gold
+    "#76B7B2",  # teal
+    "#FF9DA7",  # pink
+    "#BAB0AC",  # gray
+]
+
+CHURN_COLOR_MAP = {"No": "#EB8284", "Yes": "#4E79A7"}
+
+CHART_LAYOUT = dict(
+    plot_bgcolor="white",
+    paper_bgcolor="white",
+    font_color="#334155",
+    title_font_size=15,
+    title_font_color="#0f172a",
+)
+
+#######################################
 # CHART SECTION
 #######################################
-st.markdown("<div class='section'>📈 Customer Insights</div>", unsafe_allow_html=True)
+st.markdown("<div class='section'>📈 Analytics</div>", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
 with col1:
     fig = px.pie(df, names='Churn', hole=0.5,
-                 title='Churn Distribution')
+                 title='Churn Distribution',
+                 color='Churn',
+                 color_discrete_map=CHURN_COLOR_MAP)
+    fig.update_layout(**CHART_LAYOUT)
     st.plotly_chart(fig, use_container_width=True)
 
 with col2:
     contract = df['Contract'].value_counts()
     fig = px.bar(x=contract.index, y=contract.values,
-                 title='Contract Types')
+                 title='Contract Types',
+                 color=contract.index,
+                 color_discrete_sequence=TABLEAU10)
+    fig.update_layout(**CHART_LAYOUT, showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
 col3, col4 = st.columns(2)
 
 with col3:
     fig = px.histogram(df, x='MonthlyCharges', nbins=30,
-                       title='Monthly Charges Distribution')
+                       title='Monthly Charges Distribution',
+                       color_discrete_sequence=["#ACC2C9"])
+    fig.update_layout(**CHART_LAYOUT)
     st.plotly_chart(fig, use_container_width=True)
 
 with col4:
     payment = df['PaymentMethod'].value_counts()
     fig = px.bar(x=payment.index, y=payment.values,
-                 title='Payment Methods')
+                 title='Payment Methods',
+                 color=payment.index,
+                 color_discrete_sequence=TABLEAU10)
+    fig.update_layout(**CHART_LAYOUT, showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
 col5, col6 = st.columns(2)
@@ -182,38 +380,15 @@ col5, col6 = st.columns(2)
 with col5:
     internet = df['InternetService'].value_counts()
     fig = px.bar(x=internet.index, y=internet.values,
-                 title='Internet Services')
+                 title='Internet Services',
+                 color=internet.index,
+                 color_discrete_sequence=TABLEAU10)
+    fig.update_layout(**CHART_LAYOUT, showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
 with col6:
     fig = px.box(df, x='Churn', y='tenure', color='Churn',
-                 title='Tenure vs Churn')
+                 title='Tenure vs Churn',
+                 color_discrete_map=CHURN_COLOR_MAP)
+    fig.update_layout(**CHART_LAYOUT)
     st.plotly_chart(fig, use_container_width=True)
-
-#######################################
-# EXECUTIVE SUMMARY
-#######################################
-st.markdown("<div class='section'>🧠 Executive Intelligence</div>", unsafe_allow_html=True)
-
-high_contract = df[df['Churn'] == 'Yes']['Contract'].value_counts().idxmax()
-high_payment = df[df['Churn'] == 'Yes']['PaymentMethod'].value_counts().idxmax()
-high_internet = df[df['Churn'] == 'Yes']['InternetService'].value_counts().idxmax()
-
-st.info(f"""
-### Key Findings
-- Total Customers: {customers}
-- Churn Rate: {churn_rate}%
-- Avg Monthly Bill: ${avg_bill}
-- Avg Tenure: {avg_tenure} months
-
-### High Risk Segment
-- Contract: {high_contract}
-- Payment: {high_payment}
-- Internet: {high_internet}
-
-### Business Actions
-✔ Promote Annual Contracts  
-✔ Improve Fiber Services  
-✔ Auto-pay Incentives  
-✔ Loyalty Programs  
-""")
