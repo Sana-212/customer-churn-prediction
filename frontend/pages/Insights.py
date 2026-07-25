@@ -344,18 +344,12 @@ AI-powered analysis for churn reduction and customer behavior insights
 # LOAD DATA
 ############################################
 
-if "uploaded_df" in st.session_state:
-
-    df = st.session_state["uploaded_df"]
-
+if "prediction_results" in st.session_state:
+    df = st.session_state["prediction_results"]
 else:
-
-    st.warning(
-        "⚠️ Please upload a customer CSV file from the Upload page first."
-    )
-
+    st.warning("⚠️ Please run a prediction from the Prediction page first.")
     st.stop()
-   # Back button aligned left
+
 col1, col2, col3 = st.columns([1, 4, 1])
 
 with col1:
@@ -380,7 +374,7 @@ df.dropna(inplace=True)
 ############################################
 customers = len(df)
 
-churned = len(df[df["Churn"] == "Yes"])
+churned = len(df[df["Churn_Prediction"] == "Yes"])
 
 retained = customers - churned
 
@@ -392,19 +386,19 @@ retention_rate = round(retained / customers * 100, 2)
 # SEGMENTS (UNCHANGED LOGIC)
 ############################################
 high_contract = (
-    df[df['Churn'] == 'Yes']['Contract']
+    df[df['Churn_Prediction'] == 'Yes']['Contract']
     .value_counts()
     .idxmax()
 )
 
 high_payment = (
-    df[df['Churn'] == 'Yes']['PaymentMethod']
+    df[df['Churn_Prediction'] == 'Yes']['PaymentMethod']
     .value_counts()
     .idxmax()
 )
 
 high_internet = (
-    df[df['Churn'] == 'Yes']['InternetService']
+    df[df['Churn_Prediction'] == 'Yes']['InternetService']
     .value_counts()
     .idxmax()
 )
@@ -417,11 +411,11 @@ month_percent = round(
     2
 )
 
-fiber = len(df[(df["InternetService"] == "Fiber optic") & (df["Churn"] == "Yes")])
+fiber = len(df[(df["InternetService"] == "Fiber optic") & (df['Churn_Prediction'] == "Yes")])
 
 fiber_percent = round(fiber / churned * 100, 2)
 
-electronic = len(df[(df["PaymentMethod"] == "Electronic check") & (df["Churn"] == "Yes")])
+electronic = len(df[(df["PaymentMethod"] == "Electronic check") & (df['Churn_Prediction'] == "Yes")])
 
 electronic_percent = round(electronic / churned * 100, 2)
 

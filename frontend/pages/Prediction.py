@@ -417,24 +417,11 @@ if df is not None:
         )
 
     if st.button("Predict Churn"):
-
         try:
+            results = run_prediction_pipeline(df)
 
-        # Save uploaded file temporarily
-         temp_path = os.path.join(
-            os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")),
-            "uploaded_customer.csv"
-        )
-
-         df.to_csv(
-            temp_path,
-            index=False
-        )
-
-         results = run_prediction_pipeline(temp_path)
-
-         # Persist results so they survive navigating away and back
-         st.session_state["prediction_results"] = results
+            # Persist results so they survive navigating away and back
+            st.session_state["prediction_results"] = results
 
         except Exception as e:
             st.error(f"❌ Prediction failed: {e}")

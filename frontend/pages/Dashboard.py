@@ -243,14 +243,14 @@ AI-powered insights for customer retention and churn prediction
 #######################################
 
 
-if "uploaded_df" in st.session_state:
+if "prediction_results" in st.session_state:
 
-    df = st.session_state["uploaded_df"]
+    df = st.session_state["prediction_results"]
 
 else:
 
     st.warning(
-        "⚠️ Please upload a customer CSV file from the Prediction page first."
+        "⚠️ Please run a prediction from the Prediction page first."
     )
 
     st.stop()
@@ -271,7 +271,7 @@ df.dropna(inplace=True)
 # METRICS (UNCHANGED LOGIC)
 #######################################
 customers = len(df)
-churned = len(df[df['Churn'] == 'Yes'])
+churned = len(df[df['Churn_Prediction'] == 'Yes'])
 retained = customers - churned
 
 churn_rate = round(churned / customers * 100, 2)
@@ -341,9 +341,9 @@ st.markdown("<div class='section'>📈 Analytics</div>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 with col1:
-    fig = px.pie(df, names='Churn', hole=0.5,
+    fig = px.pie(df, names='Churn_Prediction', hole=0.5,
                  title='Churn Distribution',
-                 color='Churn',
+                 color='Churn_Prediction',
                  color_discrete_map=CHURN_COLOR_MAP)
     fig.update_layout(**CHART_LAYOUT)
     st.plotly_chart(fig, use_container_width=True)
@@ -387,7 +387,7 @@ with col5:
     st.plotly_chart(fig, use_container_width=True)
 
 with col6:
-    fig = px.box(df, x='Churn', y='tenure', color='Churn',
+    fig = px.box(df, x='Churn_Prediction', y='tenure', color='Churn_Prediction',
                  title='Tenure vs Churn',
                  color_discrete_map=CHURN_COLOR_MAP)
     fig.update_layout(**CHART_LAYOUT)

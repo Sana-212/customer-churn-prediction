@@ -6,15 +6,6 @@ __pycache__/
 
 *.pyc
 
-# ML generated files
-models/*.pkl
-
-# Reports
-reports/
-
-# Dataset
-data/*.csv
-
 # IDE
 .vscode/
 .idea/
